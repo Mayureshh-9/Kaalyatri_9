@@ -1,0 +1,39 @@
+<a
+  class="dest-card"
+  appTilt
+  [routerLink]="['/destinations', destination.id]"
+  [style.--accent]="destination.accentColor"
+>
+  <div
+    class="art"
+    [style.background]="
+      'radial-gradient(60% 60% at 30% 30%, ' + destination.accentColor + '55, transparent 65%),' +
+      'radial-gradient(60% 60% at 80% 80%, rgba(245, 197, 66, 0.12), transparent 65%)'"
+  >
+    <div class="art-rings">
+      <span></span><span></span><span></span>
+    </div>
+    <span class="emoji">{{ destination.imageEmoji }}</span>
+    <span class="year">{{ destination.yearLabel }}</span>
+    <span class="featured" *ngIf="destination.isFeatured">★ Featured</span>
+  </div>
+
+  <div class="body">
+    <span class="era">{{ destination.era }}</span>
+    <h3>{{ destination.name }}</h3>
+    <p>{{ destination.shortDescription }}</p>
+
+    <div class="meta">
+      <span><i>⏱</i> {{ destination.durationDays }} days</span>
+      <span><i>⚡</i> {{ destination.difficulty }}</span>
+    </div>
+
+    <div class="footer-row">
+      <span class="price">{{ formatPrice(destination.priceInr) }}<small>/ traveller</small></span>
+      <span class="cta-pill">
+        Explore
+        <span class="arr">→</span>
+      </span>
+    </div>
+  </div>
+</a>

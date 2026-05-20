@@ -1,0 +1,20 @@
+<nav class="nav" [class.scrolled]="scrolled">
+  <div class="container nav-inner">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <img src="assets/Kaalyatri.jpeg" alt="KaalYatri — The Time Travellers" class="brand-logo" />
+      <span class="brand-name">Kaal<span class="brand-accent">Yatri</span></span>
+    </a>
+
+    <button class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" [class.open]="menuOpen">
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">Home</a></li>
+      <li><a routerLink="/destinations" routerLinkActive="active" (click)="closeMenu()">Destinations</a></li>
+      <li><a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">About</a></li>
+      <li><a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">Contact</a></li>
+      <li><a class="nav-cta" routerLink="/book" (click)="closeMenu()">Book a Trip →</a></li>
+    </ul>
+  </div>
+</nav>

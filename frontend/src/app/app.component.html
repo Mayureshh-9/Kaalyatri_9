@@ -1,0 +1,113 @@
+<!-- Background effects layer (behind everything) -->
+<div class="bg-orbs" aria-hidden="true">
+  <span class="orb-1"></span>
+  <span class="orb-2"></span>
+  <span class="orb-3"></span>
+</div>
+
+<!-- Slow diagonal light beam sweeping across the page -->
+<div class="bg-sweep" aria-hidden="true"></div>
+
+<!-- Falling gold sparkles -->
+<div class="bg-dust" aria-hidden="true">
+  <span class="dust d1">✦</span>
+  <span class="dust d2">✦</span>
+  <span class="dust d3">✦</span>
+  <span class="dust d4">✦</span>
+  <span class="dust d5">✦</span>
+  <span class="dust d6">✦</span>
+  <span class="dust d7">✦</span>
+  <span class="dust d8">✦</span>
+  <span class="dust d9">✦</span>
+  <span class="dust d10">✦</span>
+  <span class="dust d11">✦</span>
+  <span class="dust d12">✦</span>
+</div>
+
+<!-- Corner mandala silhouettes -->
+<svg class="bg-mandala bg-mandala-tl" viewBox="0 0 200 200" aria-hidden="true">
+  <g fill="none" stroke="rgba(245,197,66,0.2)" stroke-width="0.5">
+    <circle cx="100" cy="100" r="95" stroke-dasharray="2 5"/>
+    <circle cx="100" cy="100" r="80"/>
+    <circle cx="100" cy="100" r="60" stroke-dasharray="1 3"/>
+    <g>
+      <ellipse cx="100" cy="20" rx="3" ry="14"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(30 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(60 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(90 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(120 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(150 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(180 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(210 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(240 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(270 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(300 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(330 100 100)"/>
+    </g>
+  </g>
+</svg>
+
+<svg class="bg-mandala bg-mandala-br" viewBox="0 0 200 200" aria-hidden="true">
+  <g fill="none" stroke="rgba(245,197,66,0.2)" stroke-width="0.5">
+    <circle cx="100" cy="100" r="95" stroke-dasharray="2 5"/>
+    <circle cx="100" cy="100" r="80"/>
+    <circle cx="100" cy="100" r="60" stroke-dasharray="1 3"/>
+    <g>
+      <ellipse cx="100" cy="20" rx="3" ry="14"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(30 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(60 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(90 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(120 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(150 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(180 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(210 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(240 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(270 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(300 100 100)"/>
+      <ellipse cx="100" cy="20" rx="3" ry="14" transform="rotate(330 100 100)"/>
+    </g>
+  </g>
+</svg>
+
+<app-particles></app-particles>
+<app-navbar></app-navbar>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<app-footer></app-footer>
+
+<!-- Welcome greeting -->
+<aside
+  *ngIf="showGreeting"
+  class="greeting"
+  [class.closing]="greetingClosing"
+  role="status"
+  aria-live="polite"
+>
+  <button
+    class="greeting-close"
+    type="button"
+    aria-label="Close greeting"
+    (click)="dismissGreeting()"
+  >×</button>
+
+  <span class="greeting-hand" aria-hidden="true">👋</span>
+
+  <div class="greeting-body">
+    <strong class="greeting-title">Namaste, Time Traveller!</strong>
+    <p class="greeting-text">
+      Welcome to <b>KaalYatri</b>. Pick any time in history (or the future) and we will take you there safely.
+    </p>
+    <div class="greeting-actions">
+      <a class="greeting-cta" routerLink="/destinations" (click)="dismissGreeting()">
+        Explore trips →
+      </a>
+    </div>
+  </div>
+
+  <span class="greeting-sparkle s1">✦</span>
+  <span class="greeting-sparkle s2">✦</span>
+  <span class="greeting-sparkle s3">✦</span>
+</aside>

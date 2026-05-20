@@ -1,0 +1,314 @@
+<!-- ================== HERO ================== -->
+<section class="hero" #hero>
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <span class="eyebrow" appReveal>
+        <span class="dot"></span>
+        Journeys Beyond Destinations
+      </span>
+
+      <h1 appReveal>
+        <span class="line">Travel through</span>
+        <span class="line text-gold">time itself.</span>
+      </h1>
+
+      <p class="lead" appReveal>
+        Meet kings and queens, watch dinosaurs, and even visit Mars in 2174.
+        Safe, fully guided trips. Home before dinner.
+      </p>
+
+      <!-- Search / Booking widget -->
+      <form class="search-card" (ngSubmit)="search()" appReveal>
+        <div class="search-row">
+          <label class="search-field">
+            <span class="sf-label">📍 Where</span>
+            <select [(ngModel)]="searchDestinationId" name="dest" class="sf-input">
+              <option [ngValue]="null">Pick a trip</option>
+              <option *ngFor="let d of destinations" [ngValue]="d.id">
+                {{ d.imageEmoji }} {{ d.name }} · {{ d.yearLabel }}
+              </option>
+            </select>
+          </label>
+
+          <label class="search-field">
+            <span class="sf-label">👥 Travellers</span>
+            <select [(ngModel)]="searchTravellers" name="trav" class="sf-input">
+              <option *ngFor="let n of [1,2,3,4,5,6,7,8]" [ngValue]="n">
+                {{ n }} {{ n === 1 ? 'person' : 'people' }}
+              </option>
+            </select>
+          </label>
+
+          <label class="search-field">
+            <span class="sf-label">📅 When</span>
+            <input
+              type="date"
+              [(ngModel)]="searchDate"
+              name="date"
+              class="sf-input"
+              [min]="minDate"
+            />
+          </label>
+
+          <button type="submit" class="search-submit">
+            Find My Trip
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="hero-trust" appReveal>
+        <span class="stars">★★★★★</span>
+        <span>12,000+ happy travellers · 87 places · trusted since 2026</span>
+      </div>
+    </div>
+
+    <div
+      class="hero-visual"
+      appReveal
+      [style.--px.px]="parallaxX"
+      [style.--py.px]="parallaxY"
+    >
+      <div class="hero-frame">
+        <img
+          src="assets/Kaalyatri.jpeg"
+          alt="KaalYatri — The Time Travellers"
+          class="hero-logo"
+        />
+      </div>
+      <span class="badge-float bf-1">✈️ Departures every Tuesday</span>
+      <span class="badge-float bf-2">🛡️ Fully insured</span>
+      <span class="badge-float bf-3">⭐ 4.9 / 5</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================== STATS STRIP ================== -->
+<section class="stats-strip">
+  <div class="container stats-grid">
+    <div class="stat-card" *ngFor="let s of stats" appReveal>
+      <span class="stat-value">{{ formatStat(s) }}</span>
+      <span class="stat-label">{{ s.label }}</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================== SLIDESHOW ================== -->
+<section class="section slideshow-section">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">A peek at our trips</span>
+      <h2>See where you can go</h2>
+      <p>A quick look at the kind of journeys waiting for you.</p>
+    </div>
+
+    <div
+      class="slideshow"
+      (mouseenter)="stopSlideshow()"
+      (mouseleave)="startSlideshow()"
+      appReveal
+    >
+      <div class="slide-stage">
+        <div
+          class="slide"
+          *ngFor="let s of slides; let i = index"
+          [class.active]="i === slideIndex"
+          [style.--accent]="s.accent"
+        >
+          <div class="slide-art">
+            <span class="slide-emoji">{{ s.emoji }}</span>
+          </div>
+          <div class="slide-info">
+            <span class="slide-era">{{ s.era }} · {{ s.year }}</span>
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.text }}</p>
+            <a class="btn btn-primary slide-cta" routerLink="/destinations">View trips →</a>
+          </div>
+        </div>
+      </div>
+
+      <button class="slide-arrow prev" type="button" (click)="prevSlide(); startSlideshow()" aria-label="Previous slide">‹</button>
+      <button class="slide-arrow next" type="button" (click)="nextSlide(); startSlideshow()" aria-label="Next slide">›</button>
+
+      <div class="slide-dots">
+        <button
+          *ngFor="let s of slides; let i = index"
+          type="button"
+          class="slide-dot"
+          [class.active]="i === slideIndex"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Go to slide ' + (i + 1)"
+        ></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== ERA FILTER + DESTINATIONS ================== -->
+<section class="section featured">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">Browse trips</span>
+      <h2>Pick a time period</h2>
+      <p>Click a tab to see trips from that age. Tap any card to learn more.</p>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="chips" appReveal>
+      <button
+        *ngFor="let chip of eraChips"
+        type="button"
+        class="chip"
+        [class.active]="activeEra === chip.id"
+        (click)="setEra(chip.id)"
+      >
+        <span class="chip-emoji">{{ chip.emoji }}</span>
+        <span class="chip-label">{{ chip.label }}</span>
+        <span class="chip-count">{{ countIn(chip.id) }}</span>
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="spinner"></div>
+
+    <div *ngIf="apiOffline" class="alert alert-error" style="max-width: 640px; margin: 0 auto;">
+      We can't connect to our server. Please make sure the backend is running.
+    </div>
+
+    <div class="grid grid-3" *ngIf="!loading && filtered.length">
+      <app-destination-card
+        *ngFor="let d of filtered"
+        [destination]="d"
+        appReveal
+      ></app-destination-card>
+    </div>
+
+    <p *ngIf="!loading && !filtered.length && !apiOffline" class="empty">
+      No trips in this time period yet. Try a different one.
+    </p>
+
+    <div style="text-align:center; margin-top: 48px;">
+      <a class="btn btn-ghost" routerLink="/destinations">See all trips →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================== HOW IT WORKS ================== -->
+<section class="section how">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">How it works</span>
+      <h2>Your trip in 4 easy steps</h2>
+    </div>
+
+    <div class="steps-row">
+      <div class="step" appReveal>
+        <div class="step-num">1</div>
+        <span class="step-emoji">🗺️</span>
+        <h3>Pick a time</h3>
+        <p>Choose from 87 places, dinosaurs to Mars.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step" appReveal>
+        <div class="step-num">2</div>
+        <span class="step-emoji">🎒</span>
+        <h3>Get ready</h3>
+        <p>Clothes, translator, and safety briefing.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step" appReveal>
+        <div class="step-num">3</div>
+        <span class="step-emoji">🚪</span>
+        <h3>Step inside</h3>
+        <p>Time machine boards in Mumbai with your guide.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step" appReveal>
+        <div class="step-num">4</div>
+        <span class="step-emoji">🏠</span>
+        <h3>Come home</h3>
+        <p>Back home five minutes after you left.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== WHY KAALYATRI ================== -->
+<section class="section features">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">Why pick us</span>
+      <h2>Time travel made simple and safe</h2>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="feature-card card" *ngFor="let f of features" appReveal>
+        <span class="icon">{{ f.icon }}</span>
+        <h3>{{ f.title }}</h3>
+        <p>{{ f.text }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== TESTIMONIALS ================== -->
+<section class="section testimonials">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">What people say</span>
+      <h2>Real stories from real travellers</h2>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="quote card" *ngFor="let t of testimonials" appReveal>
+        <div class="t-head">
+          <span class="t-emoji">{{ t.emoji }}</span>
+          <div>
+            <strong>{{ t.name }}</strong>
+            <span class="t-role">{{ t.role }}</span>
+          </div>
+        </div>
+        <span class="t-stars">★★★★★</span>
+        <p class="q">"{{ t.quote }}"</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== FAQ ================== -->
+<section class="section faq-section">
+  <div class="container faq-wrap">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">FAQ</span>
+      <h2>Questions our travellers ask</h2>
+      <p>Quick answers to the things people wonder before booking.</p>
+    </div>
+
+    <div class="faq-list" appReveal>
+      <div
+        class="faq-item"
+        *ngFor="let f of faqs"
+        [class.open]="f.open"
+      >
+        <button class="faq-q" type="button" (click)="toggleFaq(f)">
+          <span>{{ f.q }}</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>{{ f.a }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== CTA ================== -->
+<section class="section cta">
+  <div class="container cta-inner" appReveal>
+    <h2>Ready for your time journey?</h2>
+    <p>Book your seat today. Trips leave every Tuesday and Saturday from Mumbai.</p>
+    <div class="cta-actions">
+      <a class="btn btn-primary" routerLink="/book">Book a Trip</a>
+      <a class="btn btn-ghost" routerLink="/contact">Talk to us</a>
+    </div>
+  </div>
+</section>

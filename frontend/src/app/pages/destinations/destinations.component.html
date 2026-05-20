@@ -1,0 +1,46 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">All Trips</span>
+    <h1>Pick a time you want to <span class="text-gold">visit.</span></h1>
+    <p>Our team has visited every place. Search or filter to find your perfect trip.</p>
+
+    <div class="filter-row">
+      <input
+        type="search"
+        class="form-control"
+        placeholder="Search a time or place..."
+        [(ngModel)]="query"
+        (ngModelChange)="applyFilters()"
+      />
+      <select class="form-control" [(ngModel)]="difficulty" (ngModelChange)="applyFilters()">
+        <option value="all">All trip levels</option>
+        <option value="Easy">Easy</option>
+        <option value="Moderate">Moderate</option>
+        <option value="Adventurous">Adventurous</option>
+        <option value="Intense">Intense</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div *ngIf="loading" class="spinner"></div>
+
+    <div *ngIf="apiOffline" class="alert alert-error" style="max-width: 640px; margin: 0 auto;">
+      We can't connect to our server. Please make sure the backend is running.
+    </div>
+
+    <div class="grid grid-3" *ngIf="!loading && filtered.length">
+      <app-destination-card
+        *ngFor="let d of filtered"
+        [destination]="d"
+        appReveal
+      ></app-destination-card>
+    </div>
+
+    <p *ngIf="!loading && !filtered.length && !apiOffline" style="text-align:center; color: var(--text-dim);">
+      No trips match your search. Try different words.
+    </p>
+  </div>
+</section>

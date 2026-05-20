@@ -1,0 +1,56 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">About Us</span>
+    <h1>We are <span class="text-gold">KaalYatri.</span></h1>
+    <p>A small team of scientists, history teachers, and travel lovers. We believe time travel is the next great way to see the world.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container manifesto" appReveal>
+    <h2>Our story</h2>
+    <p>
+      For a long time, people dreamed of visiting other planets and stars. We thought the next big thing
+      in travel would be space. We were wrong. The next big thing is travel through time.
+    </p>
+    <p>
+      Our time machines are safe, fully insured, and led by some of India's best historians and scientists.
+      You don't change history — you just see it, hear it, taste it, and come home with stories you will
+      never forget.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">Our journey</span>
+      <h2>How we grew, year by year</h2>
+    </div>
+    <ol class="timeline">
+      <li *ngFor="let m of milestones" appReveal>
+        <span class="t-year">{{ m.year }}</span>
+        <div class="t-body">
+          <h3>{{ m.title }}</h3>
+          <p>{{ m.text }}</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title" appReveal>
+      <span class="eyebrow">Our team</span>
+      <h2>The people behind KaalYatri</h2>
+    </div>
+    <div class="grid grid-3">
+      <div class="card team-card" *ngFor="let t of team" appReveal appTilt>
+        <span class="emoji">{{ t.emoji }}</span>
+        <h3>{{ t.name }}</h3>
+        <span class="role">{{ t.role }}</span>
+      </div>
+    </div>
+  </div>
+</section>

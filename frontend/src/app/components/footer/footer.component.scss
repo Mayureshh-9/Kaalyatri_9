@@ -1,0 +1,102 @@
+.footer {
+  margin-top: 100px;
+  padding: 80px 0 28px;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, transparent, rgba(245, 197, 66, 0.04));
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1.1fr 1.4fr;
+  gap: 48px;
+}
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 580px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
+
+.footer-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: black;
+  border: 1px solid var(--border-strong);
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(245, 197, 66, 0.20);
+}
+.footer-brand h3 {
+  margin: 0 0 6px;
+  font-size: 1.5rem;
+}
+.footer-brand .tag {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.footer-col h4 {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.footer-col a {
+  color: var(--text-dim);
+}
+.footer-col a:hover { color: var(--text); }
+
+.news-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.news-form input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-family: inherit;
+}
+.news-form input:focus { outline: none; border-color: var(--gold); }
+.news-form button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: none;
+  background: var(--gradient-gold);
+  color: #1a1208;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.news-form button:hover { transform: translateY(-2px); }
+.news-feedback { margin-top: 10px; font-size: 0.85rem; }
+.news-feedback.ok { color: #6fe7a3; }
+.news-feedback.err { color: #ff8aae; }
+
+.footer-bottom {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  flex-wrap: wrap;
+  gap: 12px;
+}

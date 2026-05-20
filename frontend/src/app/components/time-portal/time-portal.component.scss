@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.portal-wrap {
+  position: relative;
+  width: min(440px, 85vw);
+  height: min(440px, 85vw);
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 197, 66, 0.35);
+  box-shadow: inset 0 0 50px rgba(245, 197, 66, 0.18),
+              0 0 50px rgba(245, 197, 66, 0.10);
+}
+.ring-1 { animation: spin-cw 22s linear infinite; }
+.ring-2 { inset: 8%;  animation: spin-ccw 16s linear infinite; border-style: dashed; border-color: rgba(245, 197, 66, 0.5); }
+.ring-3 { inset: 16%; animation: spin-cw 12s linear infinite; border-color: rgba(245, 197, 66, 0.6); }
+
+.core {
+  width: 0;
+  height: 0;
+  /* The hero overlays the logo on top of the portal, so the core is hidden by default. */
+  display: none;
+}
+
+.orbit {
+  position: absolute;
+  inset: 0;
+  animation: spin-cw 10s linear infinite;
+}
+.dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  margin: -4px 0 0 -4px;
+  background: var(--gold);
+  box-shadow: 0 0 14px var(--gold);
+}
+.d1 { transform: rotate(0deg) translateY(-46%); }
+.d2 { transform: rotate(120deg) translateY(-46%); background: var(--gold-2); box-shadow: 0 0 14px var(--gold-2); }
+.d3 { transform: rotate(240deg) translateY(-46%); background: var(--bronze); box-shadow: 0 0 14px var(--bronze); }
+
+@keyframes spin-cw  { to { transform: rotate(360deg); } }
+@keyframes spin-ccw { to { transform: rotate(-360deg); } }

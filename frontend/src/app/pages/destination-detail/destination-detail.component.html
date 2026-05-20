@@ -1,0 +1,60 @@
+<div *ngIf="loading" class="spinner"></div>
+
+<section *ngIf="notFound" class="section">
+  <div class="container" style="text-align:center;">
+    <h2>Trip not found</h2>
+    <p>We could not find that trip. Please pick another one.</p>
+    <a class="btn btn-primary" routerLink="/destinations">Back to all trips</a>
+  </div>
+</section>
+
+<ng-container *ngIf="destination as d">
+  <section
+    class="hero-detail"
+    [style.--accent]="d.accentColor"
+    [style.background]="'radial-gradient(circle at 20% 20%, ' + d.accentColor + '33, transparent 50%), radial-gradient(circle at 80% 80%, rgba(245, 197, 66, 0.12), transparent 50%)'"
+  >
+    <div class="container detail-grid">
+      <div class="detail-text">
+        <a routerLink="/destinations" class="back">← All trips</a>
+        <span class="era">{{ d.era }} · {{ d.yearLabel }}</span>
+        <h1>{{ d.name }}</h1>
+        <p class="lead">{{ d.shortDescription }}</p>
+
+        <div class="detail-meta">
+          <div><b>{{ d.durationDays }}</b><span>days</span></div>
+          <div><b>{{ d.difficulty }}</b><span>level</span></div>
+          <div><b>{{ formatPrice(d.priceInr) }}</b><span>per person</span></div>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap: wrap;">
+          <a class="btn btn-primary" [routerLink]="['/book', d.id]">Book this trip →</a>
+          <a class="btn btn-ghost" routerLink="/contact">Ask a question</a>
+        </div>
+      </div>
+
+      <div class="detail-emoji">
+        <span>{{ d.imageEmoji }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container body-grid">
+      <article appReveal>
+        <h2>About this trip</h2>
+        <p>{{ d.description }}</p>
+      </article>
+
+      <aside class="card highlights" appReveal>
+        <h3>What you will see</h3>
+        <ul>
+          <li *ngFor="let h of d.highlights">
+            <span class="bullet" [style.background]="d.accentColor"></span>
+            {{ h }}
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+</ng-container>

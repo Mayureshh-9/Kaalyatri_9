@@ -1,0 +1,110 @@
+.page-head {
+  position: relative;
+  padding: 80px 0 32px;
+  text-align: center;
+  overflow: hidden;
+}
+.page-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(50% 70% at 30% 20%, rgba(245, 197, 66, 0.18), transparent 60%),
+    radial-gradient(40% 60% at 80% 60%, rgba(212, 144, 79, 0.12), transparent 60%);
+  filter: blur(20px);
+  z-index: -1;
+  pointer-events: none;
+}
+.page-head .eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 18px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: rgba(245, 197, 66, 0.05);
+}
+.page-head p { max-width: 640px; margin: 0 auto; color: var(--text-dim); font-size: 1.05rem; }
+
+.manifesto {
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: left;
+}
+.manifesto h2 {
+  background: var(--gradient-cosmic);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 24px;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  max-width: 760px;
+  margin-inline: auto;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 88px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: linear-gradient(var(--primary), var(--accent), var(--accent-2));
+  opacity: 0.5;
+}
+.timeline li {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 24px;
+  padding: 18px 0;
+  align-items: start;
+  position: relative;
+}
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: 82px;
+  top: 26px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gradient-cosmic);
+  box-shadow: 0 0 14px var(--primary);
+}
+.t-year {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--accent);
+  text-align: right;
+  padding-right: 28px;
+}
+.t-body { padding-left: 36px; }
+.t-body h3 { margin-bottom: 6px; }
+
+@media (max-width: 580px) {
+  .timeline::before { left: 16px; }
+  .timeline li { grid-template-columns: 1fr; }
+  .timeline li::before { left: 10px; top: 8px; }
+  .t-year { text-align: left; padding-left: 36px; padding-right: 0; }
+  .t-body { padding-left: 36px; }
+}
+
+.team-card {
+  text-align: center;
+}
+.team-card .emoji {
+  font-size: 2.6rem;
+  display: inline-block;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 6px 14px rgba(245, 197, 66, 0.35));
+}
+.team-card h3 { margin-bottom: 4px; }
+.team-card .role { color: var(--text-dim); font-size: 0.9rem; }

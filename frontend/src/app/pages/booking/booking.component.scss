@@ -1,0 +1,101 @@
+.page-head {
+  position: relative;
+  padding: 80px 0 32px;
+  text-align: center;
+  overflow: hidden;
+}
+.page-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(50% 70% at 30% 20%, rgba(245, 197, 66, 0.18), transparent 60%),
+    radial-gradient(40% 60% at 80% 60%, rgba(212, 144, 79, 0.12), transparent 60%);
+  filter: blur(20px);
+  z-index: -1;
+  pointer-events: none;
+}
+.page-head .eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 18px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: rgba(245, 197, 66, 0.05);
+}
+.page-head p { max-width: 640px; margin: 0 auto; color: var(--text-dim); font-size: 1.05rem; }
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 900px) { .booking-grid { grid-template-columns: 1fr; } }
+
+.booking-form { padding: 32px; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+.summary {
+  position: sticky;
+  top: 100px;
+  padding: 28px;
+}
+.summary h3 {
+  margin-bottom: 18px;
+  background: var(--gradient-cosmic);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.big-emoji {
+  font-size: 4rem;
+  text-align: center;
+  margin: 8px 0 18px;
+  filter: drop-shadow(0 8px 18px rgba(245, 197, 66, 0.35));
+  animation: bob 4s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.summary .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 0.95rem;
+}
+.summary .row span { color: var(--text-dim); }
+.summary .row b { color: white; }
+.summary .total {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0 6px;
+  border-top: 1px solid var(--border-strong);
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+.summary .total b {
+  background: var(--gradient-cosmic);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 1.4rem;
+}
+.summary .note {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+}

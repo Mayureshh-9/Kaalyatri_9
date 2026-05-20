@@ -1,0 +1,53 @@
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <img src="assets/Kaalyatri.jpeg" alt="KaalYatri — The Time Travellers" class="footer-logo" />
+      <h3>Kaal<span class="text-gold">Yatri</span></h3>
+      <p class="tag">The Time Travellers · Journeys Beyond Destinations</p>
+      <p>India's first time travel agency. Safe, fully insured trips that take you to any time in history or the future.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Pages</h4>
+      <ul>
+        <li><a routerLink="/destinations">All Trips</a></li>
+        <li><a routerLink="/about">About Us</a></li>
+        <li><a routerLink="/contact">Contact</a></li>
+        <li><a routerLink="/book">Book a Trip</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Reach Us</h4>
+      <ul>
+        <li>📍 Mumbai 400001, India</li>
+        <li>✉️ <a href="mailto:abc@gmail.com">abc&#64;gmail.com</a></li>
+        <li>📞 +91 98765 43210</li>
+      </ul>
+    </div>
+
+    <div class="footer-col footer-newsletter">
+      <h4>Newsletter</h4>
+      <p>Be the first to know when we open new trips.</p>
+      <form (ngSubmit)="subscribe()" class="news-form">
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="newsEmail"
+          placeholder="your@email.com"
+          required
+        />
+        <button type="submit" [disabled]="status === 'loading'">
+          {{ status === 'loading' ? '...' : 'Join' }}
+        </button>
+      </form>
+      <p class="news-feedback" [class.ok]="status === 'ok'" [class.err]="status === 'error'" *ngIf="feedback">
+        {{ feedback }}
+      </p>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© {{ year }} KaalYatri Time Tourism Pvt. Ltd.</span>
+    <span>Made with love in India</span>
+  </div>
+</footer>

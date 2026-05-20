@@ -1,0 +1,94 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Book a Trip</span>
+    <h1>Book your <span class="text-gold">time journey.</span></h1>
+    <p>Pick your trip, the number of people, and the date. We will book your seat and email all the details within 24 hours.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div *ngIf="loading" class="spinner"></div>
+
+    <div class="booking-grid" *ngIf="!loading">
+      <form class="booking-form card" [formGroup]="form" (ngSubmit)="submit()" appReveal>
+        <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+        <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+        <div class="form-group">
+          <label>Trip *</label>
+          <select class="form-control" formControlName="destinationId">
+            <option [ngValue]="null" disabled>— pick a trip —</option>
+            <option *ngFor="let d of destinations" [ngValue]="d.id">
+              {{ d.imageEmoji }} {{ d.name }} ({{ d.yearLabel }}) · {{ formatPrice(d.priceInr) }}
+            </option>
+          </select>
+          <div class="field-error" *ngIf="controlInvalid('destinationId')">Pick a destination.</div>
+          <div class="field-error" *ngIf="fieldErrors['destinationId']">{{ fieldErrors['destinationId'] }}</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full name *</label>
+            <input class="form-control" formControlName="fullName" placeholder="As per ID" />
+            <div class="field-error" *ngIf="controlInvalid('fullName')">Please enter your name.</div>
+            <div class="field-error" *ngIf="fieldErrors['fullName']">{{ fieldErrors['fullName'] }}</div>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input class="form-control" formControlName="email" type="email" placeholder="you@email.com" />
+            <div class="field-error" *ngIf="controlInvalid('email')">Valid email required.</div>
+            <div class="field-error" *ngIf="fieldErrors['email']">{{ fieldErrors['email'] }}</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone *</label>
+            <input class="form-control" formControlName="phone" placeholder="+91 98xxx xxxxx" />
+            <div class="field-error" *ngIf="controlInvalid('phone')">Valid phone required.</div>
+            <div class="field-error" *ngIf="fieldErrors['phone']">{{ fieldErrors['phone'] }}</div>
+          </div>
+          <div class="form-group">
+            <label>Travellers *</label>
+            <input class="form-control" formControlName="travelers" type="number" min="1" max="20" />
+            <div class="field-error" *ngIf="controlInvalid('travelers')">Between 1 and 20.</div>
+            <div class="field-error" *ngIf="fieldErrors['travelers']">{{ fieldErrors['travelers'] }}</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Departure date *</label>
+          <input class="form-control" formControlName="travelDate" type="date" [min]="minDate" />
+          <div class="field-error" *ngIf="controlInvalid('travelDate')">Pick a future date.</div>
+          <div class="field-error" *ngIf="fieldErrors['travelDate']">{{ fieldErrors['travelDate'] }}</div>
+        </div>
+
+        <div class="form-group">
+          <label>Notes (optional)</label>
+          <textarea class="form-control" formControlName="notes" rows="4" placeholder="Any food choices, special needs, or languages you prefer..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="submitting">
+          {{ submitting ? 'Booking...' : 'Confirm Booking' }}
+        </button>
+      </form>
+
+      <aside class="summary card" appReveal>
+        <h3>Trip summary</h3>
+        <div *ngIf="selectedDestination() as d" class="summary-body">
+          <div class="big-emoji">{{ d.imageEmoji }}</div>
+          <div class="row"><span>Destination</span><b>{{ d.name }}</b></div>
+          <div class="row"><span>Era</span><b>{{ d.yearLabel }}</b></div>
+          <div class="row"><span>Duration</span><b>{{ d.durationDays }} days</b></div>
+          <div class="row"><span>Difficulty</span><b>{{ d.difficulty }}</b></div>
+          <div class="row"><span>Price / traveller</span><b>{{ formatPrice(d.priceInr) }}</b></div>
+          <div class="row"><span>Travellers</span><b>{{ form.value.travelers || 0 }}</b></div>
+          <div class="total"><span>Total price</span><b>{{ formatPrice(estimatedTotal()) }}</b></div>
+          <p class="note">Price includes insurance, clothes for the time period, a translator, and 24-hour help line.</p>
+        </div>
+        <p *ngIf="!selectedDestination()" class="note">Pick a trip above to see your summary.</p>
+      </aside>
+    </div>
+  </div>
+</section>

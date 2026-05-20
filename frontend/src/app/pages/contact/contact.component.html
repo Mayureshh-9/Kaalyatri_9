@@ -1,0 +1,73 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Contact</span>
+    <h1>Get in <span class="text-gold">touch with us.</span></h1>
+    <p>Have a question? Want a special trip? Just send us a message. We will reply within 24 hours.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container contact-grid">
+    <aside class="contact-info" appReveal>
+      <div class="info-card card">
+        <h3>Our Office</h3>
+        <p>Tower B, Bandra-Kurla Complex<br>Mumbai 400051, India</p>
+      </div>
+      <div class="info-card card">
+        <h3>Email</h3>
+        <p><a href="mailto:abc@gmail.com">common&#64;convis.ai</a></p>
+      </div>
+      <div class="info-card card">
+        <h3>Phone</h3>
+        <p>+91 98765 43210<br><span style="font-size:0.85rem; color: var(--text-faint);">Monday to Saturday, 9 AM to 8 PM</span></p>
+      </div>
+      <div class="info-card card">
+        <h3>Help Line (24 hours)</h3>
+        <p style="color: var(--accent-2);">+91 11000 00000<br><span style="font-size:0.85rem; color: var(--text-faint);">Open day and night for our travellers</span></p>
+      </div>
+    </aside>
+
+    <form class="contact-form card" [formGroup]="form" (ngSubmit)="submit()" appReveal>
+      <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+      <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input class="form-control" formControlName="name" placeholder="Your full name" />
+          <div class="field-error" *ngIf="controlInvalid('name')">Please enter your name (min 2 chars).</div>
+          <div class="field-error" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</div>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input class="form-control" formControlName="email" type="email" placeholder="you@email.com" />
+          <div class="field-error" *ngIf="controlInvalid('email')">Please enter a valid email.</div>
+          <div class="field-error" *ngIf="fieldErrors['email']">{{ fieldErrors['email'] }}</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone (optional)</label>
+          <input class="form-control" formControlName="phone" placeholder="+91 98xxx xxxxx" />
+          <div class="field-error" *ngIf="fieldErrors['phone']">{{ fieldErrors['phone'] }}</div>
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <input class="form-control" formControlName="subject" placeholder="What is this about?" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Message *</label>
+        <textarea class="form-control" formControlName="message" rows="6" placeholder="Tell us where you want to go, how many people, and any special needs..."></textarea>
+        <div class="field-error" *ngIf="controlInvalid('message')">Please write at least 10 characters.</div>
+        <div class="field-error" *ngIf="fieldErrors['message']">{{ fieldErrors['message'] }}</div>
+      </div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="submitting">
+        {{ submitting ? 'Sending...' : 'Send Message' }}
+      </button>
+    </form>
+  </div>
+</section>

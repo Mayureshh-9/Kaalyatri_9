@@ -1,0 +1,164 @@
+main {
+  display: block;
+  min-height: 70vh;
+  padding-top: 80px; // for fixed navbar
+}
+
+/* ============================================================
+   Welcome greeting popup (waving hand)
+   ============================================================ */
+.greeting {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 80;
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  padding: 18px 20px 18px 18px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(245, 197, 66, 0.18), rgba(212, 144, 79, 0.10)),
+    rgba(7, 6, 10, 0.92);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    0 0 60px rgba(245, 197, 66, 0.20);
+  animation: greeting-in 0.55s cubic-bezier(.2, .9, .25, 1.2) forwards;
+  overflow: hidden;
+}
+.greeting.closing { animation: greeting-out 0.35s ease forwards; }
+
+@keyframes greeting-in {
+  from { opacity: 0; transform: translateY(40px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes greeting-out {
+  from { opacity: 1; transform: translateY(0)    scale(1);    }
+  to   { opacity: 0; transform: translateY(20px) scale(0.94); }
+}
+
+/* gradient border accent */
+.greeting::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--gradient-gold);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.greeting-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.greeting-close:hover {
+  background: rgba(245, 197, 66, 0.15);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+/* ---------- Waving hand ---------- */
+.greeting-hand {
+  font-size: 2.6rem;
+  display: inline-block;
+  align-self: start;
+  transform-origin: 70% 80%;
+  animation: hand-wave 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 10px rgba(245, 197, 66, 0.35));
+}
+@keyframes hand-wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10%, 30%      { transform: rotate(22deg); }
+  20%, 40%      { transform: rotate(-10deg); }
+  50%           { transform: rotate(12deg); }
+}
+
+/* ---------- Body text ---------- */
+.greeting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.greeting-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.02em;
+}
+.greeting-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+.greeting-text b { color: var(--text); font-weight: 600; }
+
+.greeting-actions { margin-top: 6px; }
+.greeting-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--gradient-gold);
+  color: #1a1208;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(245, 197, 66, 0.35);
+  transition: transform 0.2s ease;
+}
+.greeting-cta:hover { transform: translateY(-2px); }
+
+/* ---------- Drifting sparkles ---------- */
+.greeting-sparkle {
+  position: absolute;
+  color: var(--gold);
+  font-size: 0.7rem;
+  text-shadow: 0 0 8px rgba(245, 197, 66, 0.7);
+  pointer-events: none;
+  animation: sparkle-twinkle 2.4s ease-in-out infinite;
+  opacity: 0;
+}
+.greeting-sparkle.s1 { top: 14px;     left: 56px;  animation-delay: 0.4s; }
+.greeting-sparkle.s2 { top: 36px;     left: 22px;  animation-delay: 1s;   }
+.greeting-sparkle.s3 { bottom: 16px;  left: 68px;  animation-delay: 1.6s; }
+@keyframes sparkle-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.6) rotate(0deg);   }
+  50%      { opacity: 1; transform: scale(1.2) rotate(180deg); }
+}
+
+@media (max-width: 480px) {
+  .greeting {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
