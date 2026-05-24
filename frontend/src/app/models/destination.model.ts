@@ -1,4 +1,5 @@
 export interface Destination {
+duration: any;
   id: number;
   name: string;
   era: string;

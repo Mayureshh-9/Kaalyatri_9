@@ -1,276 +1,454 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { ApiService } from '../../services/api.service';
-import { Destination } from '../../models/destination.model';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Pipe, PipeTransform } from '@angular/core';
 
-interface CounterStat {
+// ── Interfaces ────────────────────────────────────────────
+export interface Destination {
+  id: number;
+  name: string;
+  location: string;
+  category: string;
+  price: string;
+  rating: number;
+  duration: string;
+  imageUrl: string;
+  description: string;
+}
+
+export interface FilterChip {
+  id: string;
   label: string;
-  target: number;
+}
+
+export interface Stat {
+  label: string;
   current: number;
+  target: number;
+  suffix: string;
 }
 
-type EraCategory = 'all' | 'ancient' | 'classic' | 'modern' | 'future';
-
-interface EraChip {
-  id: EraCategory;
-  label: string;
-  emoji: string;
+export interface CalendarDay {
+  date: number;
+  disabled: boolean;
+  selected: boolean;
+  fullDate: Date;
 }
 
-interface Slide {
-  emoji: string;
-  era: string;
-  year: string;
-  title: string;
-  text: string;
-  accent: string;
-}
-
-interface Faq {
+export interface Faq {
   q: string;
   a: string;
   open: boolean;
 }
 
+export interface Step {
+  title: string;
+  text: string;
+  svgPath: string;
+}
+
+export interface Feature {
+  title: string;
+  text: string;
+  svgPath: string;
+}
+
+// ── SafeHtml Pipe ─────────────────────────────────────────
+@Pipe({ name: 'safeHtml' })
+export class SafeHtmlPipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) {}
+  transform(value: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(value);
+  }
+}
+
+// ── Component ─────────────────────────────────────────────
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
-  destinations: Destination[] = [];
-  filtered: Destination[] = [];
-  loading = true;
-  apiOffline = false;
+export class HomeComponent implements OnInit, OnDestroy {
 
-  /* ---------- Search widget ---------- */
-  searchDestinationId: number | null = null;
-  searchTravellers = 2;
-  searchDate = '';
-  minDate = '';
+  // ── Nav ──────────────────────────────────────────────────
+  mobileMenuOpen = false;
 
-  /* ---------- Era category filter ---------- */
-  activeEra: EraCategory = 'all';
-  eraChips: EraChip[] = [
-    { id: 'all',     label: 'All Trips', emoji: '🌍' },
-    { id: 'ancient', label: 'Ancient',   emoji: '🏺' },
-    { id: 'classic', label: 'Classic',   emoji: '🏰' },
-    { id: 'modern',  label: 'Modern',    emoji: '🎩' },
-    { id: 'future',  label: 'Future',    emoji: '🚀' },
+  // ── Hero slideshow ───────────────────────────────────────
+  heroSlideIndex = 0;
+  private slideTimer: any;
+  heroSlides = [
+    { img: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=85' },  // Taj Mahal
+    { img: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1800&q=85' },  // Kedarnath
+    { img: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1800&q=85' },  // Kerala
+    { img: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=1800&q=85' },  // Goa
   ];
 
-  /* ---------- Static content ---------- */
-  features = [
-    { icon: '🛡️', title: 'Safe Trips',     text: 'Every journey is fully insured. Our trained guides keep you safe.' },
-    { icon: '🧭', title: 'Expert Guides',  text: 'History teachers and scientists travel with you to every place.' },
-    { icon: '🌐', title: 'Easy Talking',   text: 'A small earpiece lets you understand and speak any language.' },
-    { icon: '🪶', title: 'Period Clothes', text: 'We give you clothes from that time so you blend in with the locals.' },
-    { icon: '⏱️', title: 'Quick Return',   text: 'You come back home just five minutes after you left.' },
-    { icon: '🎟️', title: 'No Visa Needed', text: 'No paperwork, no airports, no queues. Just step in and go.' },
+  // ── Search ───────────────────────────────────────────────
+  selectedDestination: Destination | null = null;
+  travellersCount = 2;
+  selectedDate: Date | null = null;
+  selectedDateFormatted = '';
+  calendarOpen = false;
+
+  // ── Calendar ─────────────────────────────────────────────
+  currentYear  = new Date().getFullYear();
+  currentMonth = new Date().getMonth();
+  calendarDays: CalendarDay[] = [];
+
+  // ── Filters ──────────────────────────────────────────────
+  activeFilter = 'all';
+  filterChips: FilterChip[] = [
+    { id: 'all',      label: 'All Destinations' },
+    { id: 'dham',     label: '4 Dham Yatra'     },
+    { id: 'beach',    label: 'Beaches'           },
+    { id: 'heritage', label: 'Heritage'          },
+    { id: 'hill',     label: 'Hill Stations'     },
   ];
 
+  // ── Destinations ─────────────────────────────────────────
+  destinations: Destination[] = [
+    {
+      id: 1, name: 'Kedarnath', location: 'Uttarakhand', category: 'dham',
+      price: '₹12,999', rating: 4.9, duration: '4 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=700&q=80',
+      description: 'Sacred Himalayan shrine nestled among snow-capped peaks, part of the revered Char Dham circuit.'
+    },
+    {
+      id: 2, name: 'Badrinath', location: 'Uttarakhand', category: 'dham',
+      price: '₹11,999', rating: 4.8, duration: '4 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1590577976322-3d2d6a2130f4?w=700&q=80',
+      description: 'Ancient temple town on the banks of Alaknanda, surrounded by breathtaking alpine scenery.'
+    },
+    {
+      id: 3, name: 'Dwarka', location: 'Gujarat', category: 'dham',
+      price: '₹9,999', rating: 4.7, duration: '3 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=700&q=80',
+      description: 'The ancient city of Lord Krishna, one of the four sacred dhams of Hindu pilgrimage.'
+    },
+    {
+      id: 4, name: 'Puri', location: 'Odisha', category: 'dham',
+      price: '₹8,999', rating: 4.8, duration: '3 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=700&q=80',
+      description: 'Home to the magnificent Jagannath Temple and pristine golden shores along the Bay of Bengal.'
+    },
+    {
+      id: 5, name: 'Kerala Backwaters', location: 'Kerala', category: 'beach',
+      price: '₹15,999', rating: 4.9, duration: '5 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=700&q=80',
+      description: 'Glide through emerald canals on a luxury houseboat surrounded by coconut palms and serenity.'
+    },
+    {
+      id: 6, name: 'Goa Beaches', location: 'Goa', category: 'beach',
+      price: '₹12,499', rating: 4.8, duration: '4 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=700&q=80',
+      description: 'Sun-drenched beaches, vibrant nightlife, and centuries of Portuguese colonial heritage.'
+    },
+    {
+      id: 7, name: 'Gokarna', location: 'Karnataka', category: 'beach',
+      price: '₹8,999', rating: 4.7, duration: '3 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1583309219338-a582f1db9a26?w=700&q=80',
+      description: 'A soul-soothing blend of pristine beaches, towering cliffs, and an ancient Shiva temple.'
+    },
+    {
+      id: 8, name: 'Hampi', location: 'Karnataka', category: 'heritage',
+      price: '₹9,999', rating: 4.8, duration: '3 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=700&q=80',
+      description: 'Timeless ruins of the Vijayanagara Empire — a UNESCO World Heritage Site of staggering scale.'
+    },
+    {
+      id: 9, name: 'Jaipur', location: 'Rajasthan', category: 'heritage',
+      price: '₹13,999', rating: 4.8, duration: '4 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1524230572899-a752b3835840?w=700&q=80',
+      description: 'The Pink City — a royal tapestry of amber forts, hawa mahals, and living Rajput traditions.'
+    },
+    {
+      id: 10, name: 'Manali', location: 'Himachal Pradesh', category: 'hill',
+      price: '₹11,999', rating: 4.7, duration: '5 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=700&q=80',
+      description: 'Snow-capped passes, roaring rivers, and thrilling adventures in the heart of the Himalayas.'
+    },
+    {
+      id: 11, name: 'Shimla', location: 'Himachal Pradesh', category: 'hill',
+      price: '₹10,999', rating: 4.6, duration: '4 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1626714262844-1e99f82b152f?w=700&q=80',
+      description: 'The Queen of Hill Stations, known for its Victorian architecture and scenic views over the mountains.'
+    },
+    {
+      id: 12, name: 'Varanasi', location: 'Uttar Pradesh', category: 'heritage',
+      price: '₹7,999', rating: 4.7, duration: '3 Days',
+      imageUrl: 'https://images.unsplash.com/photo-1559929406-ec2a9f76f40f?w=700&q=80',
+      description: 'An ancient city with spiritual significance, famous for its ghats along the sacred Ganges River.'
+    }
+  ];
+
+  filteredDestinations: Destination[] = [];
+  loading = false;
+
+  // ── Statistics ───────────────────────────────────────────
+  stats: Stat[] = [
+    { label: 'Happy Travelers', current: 0, target: 8500, suffix: '+' },
+    { label: 'Destinations', current: 0, target: 50, suffix: '+' },
+    { label: 'Years Experience', current: 0, target: 20, suffix: '+' },
+    { label: 'Satisfaction', current: 0, target: 99, suffix: '%' }
+  ];
+
+  // ── How It Works ────────────────────────────────────────
+  steps: Step[] = [
+    {
+      title: 'Choose your destination',
+      text: 'Browse curated trips and pick the place that matches your vibe.',
+      svgPath: '<path d="M12 2a7 7 0 0 1 7 7c0 4.9-5.2 10.1-6.5 11.6a1 1 0 0 1-1.5 0C10.2 19.1 5 13.9 5 9a7 7 0 0 1 7-7Z"/><circle cx="12" cy="9" r="2.5"/>'
+    },
+    {
+      title: 'Pick your date',
+      text: 'Select a travel date that fits your schedule and plan your journey.',
+      svgPath: '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/>'
+    },
+    {
+      title: 'Confirm your booking',
+      text: 'Review the itinerary, confirm your package, and let us handle the rest.',
+      svgPath: '<path d="M5 12.5 10 17l9-9"/>'
+    },
+    {
+      title: 'Travel with ease',
+      text: 'Enjoy seamless transfers, stays, and support throughout your trip.',
+      svgPath: '<path d="M4 12h16M12 4v16"/>'
+    }
+  ];
+
+  // ── Features ─────────────────────────────────────────────
+  features: Feature[] = [
+    { title: 'Safe Travel', text: 'Fully insured trips with 24/7 customer support', svgPath: '' },
+    { title: 'Expert Guides', text: 'Local experts who know every hidden gem', svgPath: '' },
+    { title: 'Best Hotels', text: 'Handpicked accommodations for your comfort', svgPath: '' },
+    { title: 'Best Price', text: 'No hidden charges, price match guaranteed', svgPath: '' },
+    { title: 'Private Transfers', text: 'Comfortable vehicles for your journey', svgPath: '' },
+    { title: '24/7 Support', text: 'We are always here to help you', svgPath: '' }
+  ];
+
+  // ── Testimonials ─────────────────────────────────────────
   testimonials = [
-    { name: 'Aarav S.',  role: 'Mumbai',     emoji: '🚂', stars: 5, quote: 'I had dinner with Akbar! KaalYatri made it easy and safe.' },
-    { name: 'Priya M.',  role: 'Bengaluru',  emoji: '✈️', stars: 5, quote: 'I saw the Wright Brothers fly. Cried all the way back home.' },
-    { name: 'Marcus L.', role: 'Singapore',  emoji: '🚢', stars: 5, quote: 'The Mars Colony 2174 trip was the best holiday of my life.' },
+    { name: 'Ramesh Sharma', city: 'Delhi', quote: 'The Kedarnath yatra was beautifully organized. Everything from transport to accommodation was perfect!' },
+    { name: 'Priya Nair', city: 'Mumbai', quote: 'Kerala backwaters tour exceeded all expectations. Our guide was amazing and the houseboat stay was magical.' },
+    { name: 'Ankit Verma', city: 'Bengaluru', quote: 'Goa trip was fantastic! Great hotel, smooth transfers, and perfect itinerary. Will book again!' }
   ];
 
-  stats: CounterStat[] = [
-    { label: 'Travellers',    target: 12480, current: 0 },
-    { label: 'Time periods',  target: 87,    current: 0 },
-    { label: 'Years covered', target: 24000, current: 0 },
-    { label: 'Accidents',     target: 0,     current: 0 },
-  ];
-
-  /* ---------- Slideshow ---------- */
-  slides: Slide[] = [
-    { emoji: '🏜️', era: 'Ancient Egypt', year: '2560 BCE', title: 'Watch the Great Pyramid rise',     text: 'Stand on the banks of the Nile while masons place the final stones of Khufu\'s pyramid.', accent: '#f5b400' },
-    { emoji: '🎨', era: 'Renaissance',    year: '1503 CE',  title: 'Sip wine with Da Vinci',          text: 'Walk the streets of Florence, visit Leonardo\'s workshop, and watch him sketch the Mona Lisa.', accent: '#c9356b' },
-    { emoji: '🕌', era: 'Mughal Agra',    year: '1648 CE',  title: 'See the Taj Mahal newly built',   text: 'The marble is still bright. Meet artisans from Persia and ride a royal elephant.', accent: '#26c2a8' },
-    { emoji: '🦖', era: 'Cretaceous',     year: '66M BCE',  title: 'Float over a dinosaur valley',    text: 'A safe hover-pod takes you above nesting hadrosaurs and stalking T. Rex.', accent: '#5cb85c' },
-    { emoji: '🪐', era: 'Mars Colony',    year: '2174 CE',  title: 'Walk on the red planet',          text: 'Tour New Olympus city, take the maglev to Olympus Mons, attend a zero-G concert.', accent: '#ff5470' },
-  ];
-  slideIndex = 0;
-  private slideTimer?: ReturnType<typeof setInterval>;
-
-  /* ---------- FAQ ---------- */
+  // ── FAQs ─────────────────────────────────────────────────
   faqs: Faq[] = [
-    { q: 'Is time travel safe?',
-      a: 'Yes. Every trip is fully insured and led by trained guides. We have completed over 12,000 trips with zero accidents.',
-      open: true },
-    { q: 'How long does a trip really take?',
-      a: 'From your point of view, a trip lasts 4 to 9 days. But you return home just five minutes after you left.',
-      open: false },
-    { q: 'What should I wear?',
-      a: 'Don\'t worry — we give you proper clothes for every time period, so you blend in safely with the locals.',
-      open: false },
-    { q: 'Can I bring my phone or camera?',
-      a: 'You can bring them, but they will not have signal in the past! We give you a memory journal you can keep.',
-      open: false },
-    { q: 'How much does a trip cost?',
-      a: 'Trips start at ₹1,34,999 per person. The price depends on the time period and how many days you go for.',
-      open: false },
-    { q: 'Can children come on trips?',
-      a: 'Yes, children above 12 years are welcome with a parent. We run special family trips during school holidays.',
-      open: false },
-    { q: 'Do I need a passport or visa?',
-      a: 'No paperwork at all. Time is our only border. Just bring a valid ID and arrive on the day of your trip.',
-      open: false },
+    { q: 'How do I book a trip?', a: 'Simply select your destination, travel date, number of travellers, and click "Find My Trip". You will be guided through the booking process.', open: false },
+    { q: 'What is included in the package?', a: 'All our packages include accommodation (twin sharing), breakfast, private transfers, guided tours, and 24/7 support. Flight/train tickets are extra unless specified.', open: true },
+    { q: 'Can I customize my itinerary?', a: 'Absolutely! Contact our travel consultants to create a personalized itinerary that matches your preferences and budget.', open: false },
+    { q: 'What is your cancellation policy?', a: 'Free cancellation up to 15 days before departure. 50% refund between 7-14 days. No refund within 7 days of departure.', open: false },
+    { q: 'Do you offer group discounts?', a: 'Yes! Groups of 6 or more receive special discounts. Contact our group travel desk for a custom quote.', open: false },
+    { q: 'Do you provide travel insurance?', a: 'We strongly recommend travel insurance. We partner with leading insurers to offer comprehensive coverage options.', open: false }
   ];
+galleryImages: any;
 
-  /* ---------- Parallax ---------- */
-  parallaxX = 0;
-  parallaxY = 0;
-
-  @ViewChild('hero') heroRef?: ElementRef<HTMLElement>;
-  private countersStarted = false;
-
-  constructor(private api: ApiService, private router: Router) {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    this.minDate = tomorrow.toISOString().split('T')[0];
-    this.searchDate = this.minDate;
+  // ── Component Life Cycle ─────────────────────────────────
+  ngOnInit() {
+    this.applyFilter();
+    this.initCalendar();
+    this.setupStatsObserver();
+    this.startSlideShow();
   }
 
-  ngOnInit(): void {
-    this.api.getDestinations().subscribe({
-      next: (items) => {
-        this.destinations = items;
-        this.applyFilter();
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.apiOffline = true;
-      },
-    });
-
-    this.startSlideshow();
+  ngOnDestroy() {
+    clearInterval(this.slideTimer);
   }
 
-  ngOnDestroy(): void {
-    this.stopSlideshow();
+  // ── Start Hero Slideshow ─────────────────────────────────
+  startSlideShow() {
+    this.slideTimer = setInterval(() => {
+      this.heroSlideIndex = (this.heroSlideIndex + 1) % this.heroSlides.length;
+    }, 5000);
   }
 
-  ngAfterViewInit(): void {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && !this.countersStarted) {
-            this.countersStarted = true;
-            this.runCounters();
-            observer.disconnect();
-            break;
-          }
+  // ── Stats Animation ────────────────────────────────────
+  private statsAnimated = false;
+
+  setupStatsObserver() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !this.statsAnimated) {
+          this.statsAnimated = true;
+          this.animateStats();
+          observer.disconnect();
         }
-      },
-      { threshold: 0.4 },
-    );
+      });
+    }, { threshold: 0.3 });
+
     setTimeout(() => {
-      const node = document.querySelector('.stats-strip');
-      if (node) observer.observe(node);
-    }, 0);
+      const statsElement = document.querySelector('.stats-strip');
+      if (statsElement) observer.observe(statsElement);
+    }, 100);
   }
 
-  /* ---------- Era filter ---------- */
-  setEra(id: EraCategory): void {
-    this.activeEra = id;
+  animateStats() {
+    const duration = 1500;
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      this.stats.forEach(stat => {
+        stat.current = Math.floor(stat.target * eased);
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        this.stats.forEach(stat => {
+          stat.current = stat.target;
+        });
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }
+
+  // ── Filter Logic ────────────────────────────────────────
+  setFilter(filterId: string) {
+    this.activeFilter = filterId;
     this.applyFilter();
   }
 
-  applyFilter(): void {
-    if (this.activeEra === 'all') {
-      this.filtered = this.destinations.slice(0, 6);
-      return;
-    }
-    this.filtered = this.destinations
-      .filter((d) => this.categoryOf(d) === this.activeEra)
-      .slice(0, 6);
-  }
-
-  countIn(id: EraCategory): number {
-    if (id === 'all') return this.destinations.length;
-    return this.destinations.filter((d) => this.categoryOf(d) === id).length;
-  }
-
-  private categoryOf(d: Destination): EraCategory {
-    const label = (d.yearLabel || '').toUpperCase();
-    if (label.includes('BCE') || label.includes('M ')) return 'ancient';
-    const num = parseInt(label.replace(/[^0-9]/g, ''), 10) || 0;
-    if (num < 1800) return 'classic';
-    if (num < 2026) return 'modern';
-    return 'future';
-  }
-
-  /* ---------- Search widget ---------- */
-  search(): void {
-    if (this.searchDestinationId) {
-      this.router.navigate(['/book', this.searchDestinationId]);
+  applyFilter() {
+    if (this.activeFilter === 'all') {
+      this.filteredDestinations = [...this.destinations];
     } else {
-      this.router.navigate(['/destinations']);
+      this.filteredDestinations = this.destinations.filter(d => d.category === this.activeFilter);
     }
   }
 
-  /* ---------- Slideshow ---------- */
-  startSlideshow(): void {
-    this.stopSlideshow();
-    this.slideTimer = setInterval(() => this.nextSlide(), 4500);
-  }
-  stopSlideshow(): void {
-    if (this.slideTimer) clearInterval(this.slideTimer);
-    this.slideTimer = undefined;
-  }
-  nextSlide(): void { this.slideIndex = (this.slideIndex + 1) % this.slides.length; }
-  prevSlide(): void { this.slideIndex = (this.slideIndex - 1 + this.slides.length) % this.slides.length; }
-  goToSlide(i: number): void { this.slideIndex = i; this.startSlideshow(); }
-
-  /* ---------- FAQ ---------- */
-  toggleFaq(faq: Faq): void {
-    const wasOpen = faq.open;
-    this.faqs.forEach((f) => (f.open = false));
-    faq.open = !wasOpen;
+  getCountByCategory(categoryId: string): number {
+    if (categoryId === 'all') return this.destinations.length;
+    return this.destinations.filter(d => d.category === categoryId).length;
   }
 
-  /* ---------- Hero parallax ---------- */
-  @HostListener('mousemove', ['$event'])
-  onMouseMove(e: MouseEvent): void {
-    const node = this.heroRef?.nativeElement;
-    if (!node) return;
-    const rect = node.getBoundingClientRect();
-    if (
-      e.clientY < rect.top ||
-      e.clientY > rect.bottom ||
-      e.clientX < rect.left ||
-      e.clientX > rect.right
-    ) {
-      this.parallaxX = 0;
-      this.parallaxY = 0;
+  getRatingStars(rating: number): number[] {
+    return Array(Math.floor(rating)).fill(0);
+  }
+
+  // ── Calendar Functionality ──────────────────────────────
+  initCalendar() {
+    this.generateCalendarDays();
+  }
+
+  generateCalendarDays() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+    const startDay = firstDay.getDay();
+    const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+
+    const days: CalendarDay[] = [];
+
+    // Add empty cells for start of month
+    for (let i = 0; i < startDay; i++) {
+      days.push({ date: 0, disabled: true, selected: false, fullDate: new Date() });
+    }
+
+    // Add actual days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cellDate = new Date(this.currentYear, this.currentMonth, d);
+      const isDisabled = cellDate < today;
+      const isSelected = !!this.selectedDate && cellDate.toDateString() === this.selectedDate.toDateString();
+      days.push({
+        date: d,
+        disabled: isDisabled,
+        selected: isSelected,
+        fullDate: cellDate
+      });
+    }
+
+    this.calendarDays = days;
+  }
+
+  get currentMonthName(): string {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return monthNames[this.currentMonth];
+  }
+
+  prevMonth() {
+    this.currentMonth--;
+    if (this.currentMonth < 0) {
+      this.currentMonth = 11;
+      this.currentYear--;
+    }
+    this.generateCalendarDays();
+  }
+
+  nextMonth() {
+    this.currentMonth++;
+    if (this.currentMonth > 11) {
+      this.currentMonth = 0;
+      this.currentYear++;
+    }
+    this.generateCalendarDays();
+  }
+
+  selectDate(day: CalendarDay) {
+    if (day.disabled || day.date === 0) return;
+
+    this.selectedDate = new Date(this.currentYear, this.currentMonth, day.date);
+    this.selectedDateFormatted = this.selectedDate.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+    this.calendarOpen = false;
+    this.generateCalendarDays();
+  }
+
+  toggleCalendar() {
+    this.calendarOpen = !this.calendarOpen;
+    if (this.calendarOpen) {
+      this.generateCalendarDays();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.datepicker-wrapper')) {
+      this.calendarOpen = false;
+    }
+  }
+
+  // ── Search ───────────────────────────────────────────────
+  onDestinationChange() {
+    // Optional: Auto-populate price or other details when destination is selected
+  }
+
+  search() {
+    if (!this.selectedDestination) {
+      alert('Please select a destination');
       return;
     }
-    const px = (e.clientX - rect.left) / rect.width - 0.5;
-    const py = (e.clientY - rect.top) / rect.height - 0.5;
-    this.parallaxX = px * 24;
-    this.parallaxY = py * 24;
+    if (!this.selectedDate) {
+      alert('Please select a travel date');
+      return;
+    }
+
+    alert(`🔍 Searching for ${this.selectedDestination.name}\n👥 ${this.travellersCount} travellers\n📅 ${this.selectedDateFormatted}\n\nOur team will contact you shortly with the best options!`);
   }
 
-  /* ---------- Animated counters ---------- */
-  private runCounters(): void {
-    const duration = 1600;
-    const start = performance.now();
-    const tick = (now: number): void => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      this.stats = this.stats.map((s) => ({ ...s, current: Math.round(s.target * eased) }));
-      if (t < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+  viewDestination(destination: Destination) {
+    alert(`📍 ${destination.name}\n\n${destination.description}\n💰 ${destination.price} per person\n📅 ${destination.duration}\n⭐ Rating: ${destination.rating}/5\n\nContact us to book this amazing journey!`);
   }
 
-  formatStat(s: CounterStat): string {
-    return s.current.toLocaleString('en-IN');
+  scrollToSearch() {
+    const searchCard = document.querySelector('.search-card');
+    searchCard?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  formatPrice(p: number): string {
-    return '₹' + p.toLocaleString('en-IN');
+  contactUs() {
+    alert('📞 Call us: +91 98765 43210\n✉️ Email: hello@kaalyatri.com\n\nWe\'d love to help you plan your journey!');
+  }
+
+  toggleFaq(index: number) {
+    this.faqs[index].open = !this.faqs[index].open;
   }
 }
