@@ -1,21 +1,27 @@
-import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
+from typing import Optional
 
-load_dotenv()
+class Settings(BaseSettings):
+    # Database
+    DATABASE_URL: str = "postgresql://postgres:12345@localhost:5432/KaalYatri"
+    
+    # JWT
+    SECRET_KEY: str = "your-super-secret-key-change-this-in-production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    
+    # App
+    APP_ENV: str = "development"
+    DEBUG: bool = True
+    
+    # Company
+    COMPANY_NAME: str = "KaalYatri"
+    COMPANY_TAGLINE: str = "The Time Travellers"
+    OWNER_EMAIL: str = "abc@gmail.com"
+    FRONTEND_ORIGIN: str = "http://localhost:4200"
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
 
-
-class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "kaalyatri-time-travel-secret-2026")
-
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL",
-        "postgresql://postgres:password@localhost:5432/kaalyatri",
-    )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
-
-    OWNER_EMAIL = os.environ.get("OWNER_EMAIL", "abc@gmail.com")
-    FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:4200")
-
-    COMPANY_NAME = "KaalYatri"
-    COMPANY_TAGLINE = "The Time Travellers"
+settings = Settings()

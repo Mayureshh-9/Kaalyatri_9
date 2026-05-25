@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-
 class Destination(db.Model):
     __tablename__ = "destinations"
 
@@ -39,6 +38,25 @@ class Destination(db.Model):
             "isFeatured": self.is_featured,
         }
 
+class User(db.Model):
+    __tablename__ = "users"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    full_name = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(30))
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "fullName": self.full_name,
+            "phone": self.phone,
+            "isAdmin": self.is_admin,
+        }
 
 class ContactMessage(db.Model):
     __tablename__ = "contact_messages"
@@ -63,7 +81,6 @@ class ContactMessage(db.Model):
             "isRead": self.is_read,
             "createdAt": self.created_at.isoformat() if self.created_at else None,
         }
-
 
 class Booking(db.Model):
     __tablename__ = "bookings"
@@ -95,7 +112,6 @@ class Booking(db.Model):
             "status": self.status,
             "createdAt": self.created_at.isoformat() if self.created_at else None,
         }
-
 
 class NewsletterSubscriber(db.Model):
     __tablename__ = "newsletter_subscribers"
