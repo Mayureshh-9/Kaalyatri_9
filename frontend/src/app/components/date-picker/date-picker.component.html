@@ -1,0 +1,34 @@
+<div class="custom-datepicker">
+  <label class="datepicker-label" *ngIf="label">{{ label }}</label>
+  <div class="input-trigger" (click)="toggleCalendar()">
+    <span class="icon">📅</span>
+    <span class="value-text" [class.placeholder]="!selectedDateFormatted">
+      {{ selectedDateFormatted || placeholder }}
+    </span>
+    <span class="chevron" [class.open]="calendarOpen">▾</span>
+  </div>
+
+  <div class="calendar-popover" [class.open]="calendarOpen">
+    <div class="calendar-header">
+      <button type="button" class="nav-btn" (click)="prevMonth()">‹</button>
+      <span class="month-title">{{ currentMonthName }} {{ currentYear }}</span>
+      <button type="button" class="nav-btn" (click)="nextMonth()">›</button>
+    </div>
+
+    <div class="calendar-weekdays">
+      <span *ngFor="let day of ['Su','Mo','Tu','We','Th','Fr','Sa']">{{ day }}</span>
+    </div>
+
+    <div class="calendar-days">
+      <div 
+        *ngFor="let day of calendarDays"
+        class="day-cell"
+        [class.empty]="day.date === 0"
+        [class.disabled]="day.disabled"
+        [class.selected]="day.selected"
+        (click)="selectDate(day)">
+        {{ day.date || '' }}
+      </div>
+    </div>
+  </div>
+</div>

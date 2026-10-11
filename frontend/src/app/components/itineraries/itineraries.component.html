@@ -1,0 +1,16 @@
+<div class="itineraries-container">
+  <h3>Tour Itinerary</h3>
+  
+  <div *ngIf="loading" class="loading">Loading itinerary...</div>
+  <div *ngIf="!loading && itineraries.length === 0" class="no-itinerary">No itinerary details available.</div>
+
+  <div class="timeline" *ngIf="!loading">
+    <div class="timeline-item" *ngFor="let step of itineraries">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <h4>Day {{ step.day_number }}: {{ step.title }}</h4>
+        <p>{{ step.description }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="reviews-container">
+  <h3>Traveler Reviews</h3>
+  
+  <div *ngIf="loading" class="loading">Loading reviews...</div>
+  <div *ngIf="!loading && reviews.length === 0" class="no-reviews">No reviews yet for this destination!</div>
+
+  <div class="review-list" *ngIf="!loading">
+    <div class="review-card" *ngFor="let r of reviews">
+      <div class="rating">
+        <span class="star" *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= r.rating">★</span>
+      </div>
+      <p class="comment">{{ r.comment }}</p>
+      <small class="date">{{ r.created_date | date }}</small>
+    </div>
+  </div>
+
+  <div class="write-review">
+    <h4>Leave a Review</h4>
+    <form (ngSubmit)="submitReview()" #reviewForm="ngForm">
+      <div class="form-group">
+        <label>Rating (1-5)</label>
+        <select [(ngModel)]="newReview.rating" name="rating" required>
+          <option [value]="5">5 - Excellent</option>
+          <option [value]="4">4 - Good</option>
+          <option [value]="3">3 - Average</option>
+          <option [value]="2">2 - Poor</option>
+          <option [value]="1">1 - Terrible</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Comment</label>
+        <textarea [(ngModel)]="newReview.comment" name="comment" rows="3" placeholder="Share your experience..."></textarea>
+      </div>
+      <button type="submit" class="btn">Submit Review</button>
+    </form>
+  </div>
+</div>
